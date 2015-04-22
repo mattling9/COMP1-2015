@@ -49,13 +49,13 @@ def DisplayBoard(Board):
   print()
   for RankNo in range(1, BOARDDIMENSION + 1):
     print("     _______________________")
-    print(RankNo, end="   ")
+    print(("R"+  str(RankNo)), end="   ")
     for FileNo in range(1, BOARDDIMENSION + 1):
       print("|" + Board[RankNo][FileNo], end="")
     print("|")
   print("     _______________________")
   print()
-  print("      1  2  3  4  5  6  7  8")
+  print("      F1 F2 F3 F4 F5 F6 F7 F8")
   print()
   print()    
 
@@ -206,8 +206,15 @@ def InitialiseBoard(Board, SampleGame):
           Board[RankNo][FileNo] = "  "    
                     
 def GetMove(StartSquare, FinishSquare):
-  
-  StartSquare = int(input("Enter coordinates of square containing piece to move (file first): "))
+  validStartSquare= False
+  while validStartSquare == False:
+    try:
+      StartSquare = int(input("Enter coordinates of square containing piece to move (file first): "))
+      validStartSquare = True
+    except ValueError:
+      print("You must enter intergers here!")
+      
+    
   while StartSquare < 11:
     print("Please provde both FILE and RANK for this move")
     StartSquare = int(input("Enter coordinates of square containing piece to move (file first): "))
@@ -240,14 +247,72 @@ def ConfirmMove(StartSquare, FinishSquare):
 def MakeMove(Board, StartRank, StartFile, FinishRank, FinishFile, WhoseTurn):
   if WhoseTurn == "W" and FinishRank == 1 and Board[StartRank][StartFile][1] == "R":
     Board[FinishRank][FinishFile] = "WM"
+    print("White Redum promoted to Marzaz Pani!")
     Board[StartRank][StartFile] = "  "
   elif WhoseTurn == "B" and FinishRank == 8 and Board[StartRank][StartFile][1] == "R":
+    print("Black Redum promoted to Marzaz Pani!")
     Board[FinishRank][FinishFile] = "BM"
     Board[StartRank][StartFile] = "  "
   else:
+    PieceInfo = GetPieceName(Board[StartRank][StartFile])
     Board[FinishRank][FinishFile] = Board[StartRank][StartFile]
     Board[StartRank][StartFile] = "  "
+    print()
+    print("{0} {1} moves to File:{2}, Rank:{3}".format(PieceInfo[1], PieceInfo[0], FinishFile, FinishRank))
+  
+    
 
+def GetPieceName(BoardInfo):
+                        
+  BoardPositionList = list(str(BoardInfo))
+  PieceColourInitial = BoardPositionList[0]
+  PieceFullColour = ''
+  
+  PieceNameInitial = BoardPositionList[1]
+  PieceFullName = ''
+
+  PieceNameArray = [['G','Gusgigir'],
+                    ['E','Etlu'],
+                    ['N','Nabu'],
+                    ['M','Marzaz Pani'],
+                    ['S','Saurum'],
+                    ['R','Redum']]
+
+  for piece in PieceNameArray:
+    if PieceNameInitial == piece[0]:
+      PieceFullName = piece[1]
+
+  if PieceColourInitial == 'W':
+    PieceFullColour = 'White'
+  elif PieceColourInitial == 'B':
+    PieceFullColour = 'Black'
+
+  PieceInfo = [PieceFullName, PieceFullColour]
+  return PieceInfo
+
+
+def GetValidBoardPosition(Rank, File):
+  validPosition = False
+  validRank = False
+  validFile = False
+  if Rank > 0 and Rank < 8:
+    validRank = True
+  elif File >0 and Rank < 8:
+    validFile = True
+
+  if (validRank and validFile) == True:
+    validPosition = True
+  return validPosition
+
+  pass
+
+  pass
+
+  pass
+
+  pass
+
+  pass
     
 if __name__ == "__main__":
   Board = CreateBoard() #0th index not used
@@ -278,9 +343,6 @@ if __name__ == "__main__":
             print("That is not a legal move - please try again")
         GameOver = CheckIfGameWillBeWon(Board, FinishRank, FinishFile)
         ConfirmMoveDecision = ConfirmMove(StartSquare, FinishSquare)
-
-
-
       MakeMove(Board, StartRank, StartFile, FinishRank, FinishFile, WhoseTurn)
       if GameOver:
         DisplayWinner(WhoseTurn)
